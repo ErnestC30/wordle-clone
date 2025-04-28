@@ -14,7 +14,7 @@ import Keyboard from "./components/Keyboard";
 import { getGameState, initializeGameState } from "./utils/utils";
 
 interface GameState {
-  boardState: string[];
+  guesses: string[];
   guessCount: number;
   status: string;
 }
@@ -63,7 +63,8 @@ function App() {
   const answer = "apple"; // should retrieve from assets/wordlist.json
 
   useEffect(() => {
-    console.log(guess);
+    // console.log(`guess => ${guess}`);
+    // console.log(`answer => ${answer}`);
   }, [guess]);
 
   const submitGuess = () => {
@@ -88,7 +89,7 @@ function App() {
       console.log("winner");
       return;
     }
-    console.log(`submit guess: ${guess}`);
+    // console.log(`submit guess: ${guess}`);
     // update the display
     // update keyboard
   };
@@ -96,7 +97,7 @@ function App() {
   const updateAllGuesses = (gameState: GameState, guess: string) => {
     let updatedGameState = {
       ...gameState,
-      boardState: [...gameState.boardState, guess],
+      guesses: [...gameState.guesses, guess],
     };
     // setGuesses(updatedGuesses);
     setGameState(updatedGameState);
@@ -119,12 +120,15 @@ function App() {
       <CenteredBox>
         <Content>
           <GameBoard
+            // answer={answer}
+            guesses={gameState.guesses}
             currentGuess={guess}
-            guesses={gameState.boardState}
             guessCount={gameState.guessCount}
             maxGuesses={MAX_GUESSES}
           />
           <Keyboard
+            answer={answer}
+            guesses={gameState.guesses}
             guessUpdater={updateGuess}
             deleteChar={deleteChar}
             submitGuess={submitGuess}

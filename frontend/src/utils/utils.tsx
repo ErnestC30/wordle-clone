@@ -1,5 +1,5 @@
 interface GameState {
-  boardState: string[];
+  guesses: string[];
   guessCount: number;
   status: string;
 }
@@ -8,7 +8,7 @@ const GAME_STATE_KEY = "gameState";
 
 const initializeGameState = (): GameState => {
   return {
-    boardState: [],
+    guesses: [],
     guessCount: 0,
     status: "ongoing",
   };
@@ -26,6 +26,6 @@ const getGameState = (): GameState => {
   return gameState;
 };
 
-const updateBoardState = (guesses: string[]) => {};
+const updateGuesses = (guesses: string[]) => {};
 
-export { getGameState, initializeGameState, updateBoardState };
+export { getGameState, initializeGameState, updateGuesses };
