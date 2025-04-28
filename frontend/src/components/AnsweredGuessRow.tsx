@@ -6,6 +6,7 @@ import { CharState } from "./GuessCharacter";
 import GuessCharacter from "./GuessCharacter";
 
 interface AnsweredGuessRowProps {
+  answer: string;
   guess: string;
 }
 
@@ -30,7 +31,7 @@ function getStateOfGuessRowCharacters(guess: string, answer: string): RowState {
   // first get the matching characters then check remaining characters for 'present' state
   for (let i = 0; i < guessArray.length; i++) {
     let state: CharState = "absent";
-    if (guessArray[i] == answerArray[i]) {
+    if (guessArray[i].toLowerCase() == answerArray[i].toLowerCase()) {
       state = "correct";
       answerArray[i] = "";
     } else {
@@ -40,7 +41,7 @@ function getStateOfGuessRowCharacters(guess: string, answer: string): RowState {
   }
   // update 'present' and 'absent' states
   remaining.forEach((idx) => {
-    if (answerArray.includes(guessArray[idx])) {
+    if (answerArray.includes(guessArray[idx].toLowerCase())) {
       rowState[idx].state = "present";
     } else {
       rowState[idx].state = "absent";
@@ -50,10 +51,11 @@ function getStateOfGuessRowCharacters(guess: string, answer: string): RowState {
   return rowState;
 }
 
-const AnsweredGuessRow: React.FC<AnsweredGuessRowProps> = ({ guess }) => {
-  // need to retrieve the answer from somewhere (prop drill or context)
-  let fakeAnswer = "APPLE";
-  let rowState = getStateOfGuessRowCharacters(guess, fakeAnswer);
+const AnsweredGuessRow: React.FC<AnsweredGuessRowProps> = ({
+  answer,
+  guess,
+}) => {
+  let rowState = getStateOfGuessRowCharacters(guess, answer);
 
   return (
     <GuessRowBox>

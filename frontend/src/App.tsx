@@ -11,7 +11,7 @@ import Keyboard from "./components/Keyboard";
 // import reactLogo from './assets/react.svg'
 // import viteLogo from '/vite.svg'
 
-import { getGameState, initializeGameState } from "./utils/utils";
+import { checkValidWord, getAnswer, getGameState } from "./utils/utils";
 
 interface GameState {
   guesses: string[];
@@ -60,15 +60,22 @@ function App() {
 
   const [gameState, setGameState] = useState<GameState>(initialGameState);
   const [guess, setGuess] = useState<string>("");
-  const answer = "apple"; // should retrieve from assets/wordlist.json
+  const answer = getAnswer();
+
+  useEffect(() => {
+    console.log(`answer => ${answer}`);
+  }, []);
 
   useEffect(() => {
     // console.log(`guess => ${guess}`);
-    // console.log(`answer => ${answer}`);
   }, [guess]);
 
   const submitGuess = () => {
     // CHECK IF ANSWER IS VALID
+    if (!checkValidWord(guess)) {
+      console.log("word is not valid");
+      return;
+    }
     // check if guess is 5 letter word
     if (guess.length != GUESS_LENGTH) {
       // alert message too short
@@ -120,7 +127,7 @@ function App() {
       <CenteredBox>
         <Content>
           <GameBoard
-            // answer={answer}
+            answer={answer}
             guesses={gameState.guesses}
             currentGuess={guess}
             guessCount={gameState.guessCount}

@@ -6,7 +6,7 @@ import AnsweredGuessRow from "./AnsweredGuessRow";
 import GuessRow from "./GuessRow";
 
 interface GameBoardProps {
-  // answer: string;
+  answer: string;
   currentGuess: string;
   guesses: string[];
   guessCount: number;
@@ -20,7 +20,7 @@ const GameBoardBox = styled(Box)({
 });
 
 const GameBoard: React.FC<GameBoardProps> = ({
-  // answer,
+  answer,
   currentGuess,
   guesses,
   guessCount,
@@ -31,7 +31,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
   return (
     <GameBoardBox>
       {guesses.map((guess, idx) => (
-        <AnsweredGuessRow key={idx} guess={guess} />
+        <AnsweredGuessRow key={idx} answer={answer} guess={guess} />
       ))}
       {remainingGuesses > 0 && <GuessRow guess={currentGuess} />}
       {remainingGuesses > 0 &&
