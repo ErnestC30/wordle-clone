@@ -41,6 +41,7 @@ const getAnswer = (): string => {
 };
 
 const checkValidWord = (guess: string): boolean => {
+  // could use binary search on list for optimization
   return wordlist.words.includes(guess.toLowerCase());
 };
 
