@@ -7,9 +7,14 @@ import CharKey from "./CharKey";
 interface KeyboardProps {
   guessUpdater: (char: string) => void;
   deleteChar: () => void;
+  submitGuess: () => void;
 }
 
-const Keyboard: React.FC<KeyboardProps> = ({ guessUpdater, deleteChar }) => {
+const Keyboard: React.FC<KeyboardProps> = ({
+  guessUpdater,
+  deleteChar,
+  submitGuess,
+}) => {
   const mapper = {
     row1: ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
     row2: ["A", "S", "D", "F", "G", "H", "J", "K", "L"],
@@ -30,6 +35,7 @@ const Keyboard: React.FC<KeyboardProps> = ({ guessUpdater, deleteChar }) => {
           ))}
         </Stack>
         <Stack direction="row" spacing={1} sx={{ justifyContent: "center" }}>
+          <ActionKey text="ENTER" clickFn={submitGuess} />
           {mapper.row3.map((char) => (
             <CharKey key={char} char={char} clickFn={guessUpdater} />
           ))}

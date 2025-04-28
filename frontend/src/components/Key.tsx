@@ -9,30 +9,39 @@ interface KeyProps {
   size?: "medium" | "large";
 }
 
-const KeyButton = styled(Button)({
-  padding: "1rem",
-  minWidth: "44px",
-  width: "44px",
-  borderRadius: "6px",
-  backgroundColor: "rgb(210, 210, 210)",
-});
+// const KeyButton = styled(Button)({
+//   padding: "1rem",
+//   minWidth: "24px",
+//   maxWidth: "44px",
+//   borderRadius: "6px",
+//   backgroundColor: "rgb(210, 210, 210)",
+// });
 
-const ButtonTypography = styled(Typography)({
-  fontWeight: "bold",
-  fontSize: "1.2rem",
-  color: "rgb(0,0,0)",
-});
+// const ButtonTypography = styled(Typography)({
+//   fontSize: "1.2rem",
+//   color: "rgb(0,0,0)",
+// });
 
 const Key: React.FC<KeyProps> = ({ text, onClick, size = "medium" }) => {
+  const KeyButton = styled(Button)({
+    padding: "1rem",
+    minWidth: size == "large" ? "80px" : "24px",
+    maxWidth: "44px",
+    borderRadius: "6px",
+    backgroundColor: "rgb(210, 210, 210)",
+  });
+
+  const ButtonTypography = styled(Typography)({
+    fontSize: size == "large" ? "1rem" : "1.2rem",
+    color: "rgb(0,0,0)",
+  });
+
   const handleClick = () => {
     onClick();
   };
 
   return (
-    <KeyButton
-      onClick={() => handleClick()}
-      sx={{ ...(size == "large" && { width: "80px" }) }}
-    >
+    <KeyButton onClick={() => handleClick()}>
       <ButtonTypography sx={{ fontWeight: "bold" }}>{text}</ButtonTypography>
     </KeyButton>
   );

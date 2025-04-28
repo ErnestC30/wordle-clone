@@ -11,6 +11,14 @@ import Keyboard from "./components/Keyboard";
 // import reactLogo from './assets/react.svg'
 // import viteLogo from '/vite.svg'
 
+import { getGameState, initializeGameState } from "./utils/utils";
+
+interface GameState {
+  boardState: string[];
+  guessCount: number;
+  status: string;
+}
+
 const AppContainer = styled(Container)({
   minHeight: "100vh",
   display: "flex",
@@ -31,15 +39,26 @@ const Content = styled(Box)({
   justifyContent: "space-evenly",
 });
 
-/* TODO: 
+/* APP TODO: 
 
-board display functionality
 keyboard should not be interactable during answer check animation (or when game is complete)
-
+need to keep track of used characters in keyboard section 
+read app configuration file for settings (like MAX_GUESSES, etc.)
+allow entering key instead of only clicking
+add animations?
 
 */
 
 function App() {
+  // should store all guess attempts (as a list of strings?)
+  // store in local storage so that they can be restored / kept on page refresh
+  const GAME_STATE_KEY = "gameState";
+  const MAX_GUESSES = 6;
+  const GUESS_LENGTH = 5;
+
+  let initialGameState = getGameState();
+
+  const [gameState, setGameState] = useState<GameState>(initialGameState);
   const [guess, setGuess] = useState<string>("");
   const answer = "apple"; // should retrieve from assets/wordlist.json
 
@@ -47,15 +66,48 @@ function App() {
     console.log(guess);
   }, [guess]);
 
-  const submitGuess = (guess: string) => {
-    // check if answer is correct
+  const submitGuess = () => {
+    // CHECK IF ANSWER IS VALID
+    // check if guess is 5 letter word
+    if (guess.length != GUESS_LENGTH) {
+      // alert message too short
+      console.log("word too short");
+      return;
+    }
+    // check if guess is a valid option (binary search list ? or something)
+    // check if out of guesses
+
+    // check if guess matches answer
+
+    // ASSUME BELOW THAT GUESS IS A VALID GUESS
+    updateAllGuesses(gameState, guess);
     // reset current guess
+    setGuess("");
+    if (guess.toUpperCase() === answer.toUpperCase()) {
+      // winner
+      console.log("winner");
+      return;
+    }
+    console.log(`submit guess: ${guess}`);
     // update the display
     // update keyboard
   };
 
+  const updateAllGuesses = (gameState: GameState, guess: string) => {
+    let updatedGameState = {
+      ...gameState,
+      boardState: [...gameState.boardState, guess],
+    };
+    // setGuesses(updatedGuesses);
+    setGameState(updatedGameState);
+    localStorage.setItem(GAME_STATE_KEY, JSON.stringify(updatedGameState));
+  };
+
   const updateGuess = (char: string) => {
-    setGuess((guess) => (guess += char));
+    setGuess((guess) => {
+      if (guess.length >= GUESS_LENGTH) return guess;
+      else return (guess += char);
+    });
   };
 
   const deleteChar = () => {
@@ -66,8 +118,17 @@ function App() {
     <AppContainer>
       <CenteredBox>
         <Content>
-          <GameBoard />
-          <Keyboard guessUpdater={updateGuess} deleteChar={deleteChar} />
+          <GameBoard
+            currentGuess={guess}
+            guesses={gameState.boardState}
+            guessCount={gameState.guessCount}
+            maxGuesses={MAX_GUESSES}
+          />
+          <Keyboard
+            guessUpdater={updateGuess}
+            deleteChar={deleteChar}
+            submitGuess={submitGuess}
+          />
         </Content>
       </CenteredBox>
     </AppContainer>
@@ -75,26 +136,3 @@ function App() {
 }
 
 export default App;
-
-// <>
-//   <div>
-//     <a href="https://vite.dev" target="_blank">
-//       <img src={viteLogo} className="logo" alt="Vite logo" />
-//     </a>
-//     <a href="https://react.dev" target="_blank">
-//       <img src={reactLogo} className="logo react" alt="React logo" />
-//     </a>
-//   </div>
-//   <h1>Vite + React</h1>
-//   <div className="card">
-//     <button onClick={() => setCount((count) => count + 1)}>
-//       count is {count}
-//     </button>
-//     <p>
-//       Edit <code>src/App.tsx</code> and save to test HMR
-//     </p>
-//   </div>
-//   <p className="read-the-docs">
-//     Click on the Vite and React logos to learn more
-//   </p>
-// </>
