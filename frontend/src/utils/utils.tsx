@@ -1,41 +1,49 @@
 import wordlist from "../assets/wordlist.json";
 
+type GameStateStatus = "ongoing" | "completed";
+
 interface GameState {
   guesses: string[];
   guessCount: number;
-  status: string;
+  status: GameStateStatus;
+  date: string;
 }
 
 const DAILY_ANSWER_KEY = "dailyAnswer";
 const GAME_STATE_KEY = "gameState";
+const TIMEZONE_HOUR_OFFSET = 4; // EST from UTC
+
+const checkPuzzleReset = () => {
+  let currentDate = new Date();
+  let utcDate = new Date(
+    Date.UTC(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      currentDate.getDate(),
+      currentDate.getHours() + TIMEZONE_HOUR_OFFSET,
+      currentDate.getMinutes(),
+      currentDate.getSeconds()
+    )
+  );
+
+  let gameState = getGameState();
+
+  // reset answer + current game state
+  if (endOfDate(parseDate(gameState.date)) < utcDate) {
+    localStorage.removeItem(DAILY_ANSWER_KEY);
+    localStorage.removeItem(GAME_STATE_KEY);
+  }
+};
 
 const generateAnswer = (): string => {
   return wordlist.words[Math.floor(Math.random() * wordlist.words.length)];
 };
 
 const getAnswer = (): string => {
-  let regenerateAnswer = false;
-  let answerJson = localStorage.getItem(DAILY_ANSWER_KEY);
-  let answer;
-  // set new answer for the day
-  if (answerJson) {
-    let answerData = JSON.parse(answerJson);
-    let currentTime = new Date();
-    let expirationDate = new Date(answerData["updateTime"]);
-    expirationDate.setDate(expirationDate.getDate() + 1); // Reset after a day
-    if ("answer" in answerData && expirationDate > currentTime) {
-      answer = answerData["answer"];
-    } else {
-      regenerateAnswer = true;
-    }
-  } else {
-    regenerateAnswer = true;
-  }
-  if (regenerateAnswer) {
+  let answer = localStorage.getItem(DAILY_ANSWER_KEY);
+  if (!answer) {
     answer = generateAnswer();
-    let now = new Date();
-    let answerData = { answer: answer, updateTime: now };
-    localStorage.setItem(DAILY_ANSWER_KEY, JSON.stringify(answerData));
+    localStorage.setItem(DAILY_ANSWER_KEY, answer);
   }
   return answer;
 };
@@ -50,6 +58,7 @@ const initializeGameState = (): GameState => {
     guesses: [],
     guessCount: 0,
     status: "ongoing",
+    date: formatDate(new Date()),
   };
 };
 
@@ -65,4 +74,50 @@ const getGameState = (): GameState => {
   return gameState;
 };
 
-export { checkValidWord, getAnswer, getGameState, initializeGameState };
+const formatDate = (date: Date): string => {
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  return `${year}-${month}-${day}`;
+};
+
+const parseDate = (dateString: string): Date => {
+  const [year, month, day] = dateString.split("-");
+  const utcDate = new Date(
+    Date.UTC(
+      parseInt(year),
+      parseInt(month) - 1,
+      parseInt(day),
+      TIMEZONE_HOUR_OFFSET,
+      0,
+      0,
+      0
+    ) // month - 1 for 0 index
+  );
+  return utcDate;
+};
+
+const endOfDate = (date: Date): Date => {
+  const endOfDate = new Date(
+    Date.UTC(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      23 + TIMEZONE_HOUR_OFFSET,
+      59,
+      59,
+      999
+    )
+  );
+  return endOfDate;
+};
+
+export type { GameState, GameStateStatus };
+
+export {
+  checkPuzzleReset,
+  checkValidWord,
+  getAnswer,
+  getGameState,
+  initializeGameState,
+};

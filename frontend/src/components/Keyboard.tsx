@@ -1,12 +1,15 @@
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 
+import { GameStateStatus } from "../utils/utils";
+import { GameStateStatusContext } from "../contexts/GameStateStatusContext";
 import ActionKey from "./ActionKey";
 import CharKey from "./CharKey";
 
 interface KeyboardProps {
   answer: string;
   guesses: string[];
+  gameStateStatus: GameStateStatus;
   guessUpdater: (char: string) => void;
   deleteChar: () => void;
   submitGuess: () => void;
@@ -21,10 +24,6 @@ interface KeyboardCharMap {
 interface KeyboardCharStatePriority {
   [state: string]: number;
 }
-
-// interface KeyboardCharStatePriority {
-//   [state in KeyboardCharState]: number
-// }
 
 // state can either be correct , present, absent, unused
 // if char has been in correct spot atleast once, it should be 'correct'
@@ -71,6 +70,7 @@ function getKeyboardCharStates(
 const Keyboard: React.FC<KeyboardProps> = ({
   answer,
   guesses,
+  gameStateStatus,
   guessUpdater,
   deleteChar,
   submitGuess,
@@ -84,40 +84,42 @@ const Keyboard: React.FC<KeyboardProps> = ({
 
   return (
     <Box>
-      <Stack spacing={1}>
-        <Stack direction="row" spacing={1} sx={{ justifyContent: "center" }}>
-          {layout.row1.map((char) => (
-            <CharKey
-              key={char}
-              char={char}
-              state={stateMap[char.toUpperCase()]}
-              clickFn={guessUpdater}
-            />
-          ))}
+      <GameStateStatusContext value={gameStateStatus}>
+        <Stack spacing={1}>
+          <Stack direction="row" spacing={1} sx={{ justifyContent: "center" }}>
+            {layout.row1.map((char) => (
+              <CharKey
+                key={char}
+                char={char}
+                state={stateMap[char.toUpperCase()]}
+                clickFn={guessUpdater}
+              />
+            ))}
+          </Stack>
+          <Stack direction="row" spacing={1} sx={{ justifyContent: "center" }}>
+            {layout.row2.map((char) => (
+              <CharKey
+                key={char}
+                char={char}
+                state={stateMap[char.toUpperCase()]}
+                clickFn={guessUpdater}
+              />
+            ))}
+          </Stack>
+          <Stack direction="row" spacing={1} sx={{ justifyContent: "center" }}>
+            <ActionKey text="ENTER" clickFn={submitGuess} />
+            {layout.row3.map((char) => (
+              <CharKey
+                key={char}
+                char={char}
+                state={stateMap[char.toUpperCase()]}
+                clickFn={guessUpdater}
+              />
+            ))}
+            <ActionKey text="⌫" clickFn={deleteChar} />
+          </Stack>
         </Stack>
-        <Stack direction="row" spacing={1} sx={{ justifyContent: "center" }}>
-          {layout.row2.map((char) => (
-            <CharKey
-              key={char}
-              char={char}
-              state={stateMap[char.toUpperCase()]}
-              clickFn={guessUpdater}
-            />
-          ))}
-        </Stack>
-        <Stack direction="row" spacing={1} sx={{ justifyContent: "center" }}>
-          <ActionKey text="ENTER" clickFn={submitGuess} />
-          {layout.row3.map((char) => (
-            <CharKey
-              key={char}
-              char={char}
-              state={stateMap[char.toUpperCase()]}
-              clickFn={guessUpdater}
-            />
-          ))}
-          <ActionKey text="⌫" clickFn={deleteChar} />
-        </Stack>
-      </Stack>
+      </GameStateStatusContext>
     </Box>
   );
 };

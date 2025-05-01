@@ -4,17 +4,17 @@ import { styled } from "@mui/material";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 
+import { GameState } from "../utils/utils";
 import { useAlert } from "../contexts/AlertContext";
 import GameBoard from "./GameBoard";
 import Keyboard from "./Keyboard";
 
-import { checkValidWord, getAnswer, getGameState } from "../utils/utils";
-
-interface GameState {
-  guesses: string[];
-  guessCount: number;
-  status: string;
-}
+import {
+  checkPuzzleReset,
+  checkValidWord,
+  getAnswer,
+  getGameState,
+} from "../utils/utils";
 
 const AppContainer = styled(Container)({
   minHeight: "100vh",
@@ -53,6 +53,7 @@ function GameApp() {
   const MAX_GUESSES = 6;
   const GUESS_LENGTH = 5;
 
+  checkPuzzleReset();
   let initialGameState = getGameState();
 
   const { addAlert } = useAlert();
@@ -65,47 +66,64 @@ function GameApp() {
   }, []);
 
   useEffect(() => {
-    // console.log(`guess => ${guess}`);
-  }, [guess]);
+    if (gameState.status == "completed") {
+      console.log("winner");
+    }
+
+    if (
+      gameState.status == "ongoing" &&
+      gameState.guesses.length == MAX_GUESSES
+    ) {
+      console.log("game over");
+    }
+  }, [gameState]);
 
   const submitGuess = () => {
+    console.log(guess);
     if (guess.length != GUESS_LENGTH) {
       addAlert({ type: "error", message: "Word is too short." });
       return;
     }
 
     if (!checkValidWord(guess)) {
-      console.log("invalid word");
       addAlert({ type: "error", message: "Word not in list." });
       return;
     }
-    // check if out of guesses
-
-    // check if guess matches answer
 
     // ASSUME BELOW THAT GUESS IS A VALID GUESS
-    updateAllGuesses(gameState, guess);
-    // reset current guess
-    setGuess("");
-    if (guess.toUpperCase() === answer.toUpperCase()) {
-      // winner
-      console.log("winner");
-      return;
-    }
-    // console.log(`submit guess: ${guess}`);
-    // update the display
-    // update keyboard
-  };
 
-  const updateAllGuesses = (gameState: GameState, guess: string) => {
-    let updatedGameState = {
+    let updatedGameState: GameState = {
       ...gameState,
       guesses: [...gameState.guesses, guess],
     };
-    // setGuesses(updatedGuesses);
+
+    // reset current guess
+    setGuess("");
+
+    // winner
+    if (guess.toUpperCase() === answer.toUpperCase()) {
+      updatedGameState = {
+        ...updatedGameState,
+        status: "completed",
+      };
+    }
+
+    // should only call set fn once so have to modify gamestate before this
     setGameState(updatedGameState);
     localStorage.setItem(GAME_STATE_KEY, JSON.stringify(updatedGameState));
+
+    // update the display
   };
+
+  // const updateAllGuesses = (gameState: GameState, guess: string) => {
+  //   let updatedGameState = {
+  //     ...gameState,
+  //     guesses: [...gameState.guesses, guess],
+  //   };
+  //   // setGuesses(updatedGuesses);
+  //   setGameState(updatedGameState);
+  //   localStorage.setItem(GAME_STATE_KEY, JSON.stringify(updatedGameState));
+  // };
 
   const updateGuess = (char: string) => {
     setGuess((guess) => {
@@ -132,6 +150,7 @@ function GameApp() {
           <Keyboard
             answer={answer}
             guesses={gameState.guesses}
+            gameStateStatus={gameState.status}
             guessUpdater={updateGuess}
             deleteChar={deleteChar}
             submitGuess={submitGuess}

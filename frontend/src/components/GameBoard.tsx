@@ -23,7 +23,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
   answer,
   currentGuess,
   guesses,
-  guessCount,
   maxGuesses,
 }) => {
   let remainingGuesses = maxGuesses - (guesses ? guesses.length : 0);

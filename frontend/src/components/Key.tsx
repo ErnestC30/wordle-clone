@@ -1,8 +1,10 @@
+import { useContext } from "react";
 import { styled } from "@mui/material";
 
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 
+import { GameStateStatusContext } from "../contexts/GameStateStatusContext";
 import { KeyboardCharState } from "./Keyboard";
 
 interface KeyProps {
@@ -12,25 +14,14 @@ interface KeyProps {
   size?: "medium" | "large";
 }
 
-// const KeyButton = styled(Button)({
-//   padding: "1rem",
-//   minWidth: "24px",
-//   maxWidth: "44px",
-//   borderRadius: "6px",
-//   backgroundColor: "rgb(210, 210, 210)",
-// });
-
-// const ButtonTypography = styled(Typography)({
-//   fontSize: "1.2rem",
-//   color: "rgb(0,0,0)",
-// });
-
 const Key: React.FC<KeyProps> = ({
   text,
   onClick,
   state = "unused",
   size = "medium",
 }) => {
+  const gameStatus = useContext(GameStateStatusContext);
+
   const stateColorMap = {
     absent: "rgb(120, 124, 126)",
     present: "rgb(201, 180, 88)",
@@ -64,7 +55,11 @@ const Key: React.FC<KeyProps> = ({
   };
 
   return (
-    <KeyButton state={state} onClick={() => handleClick()}>
+    <KeyButton
+      state={state}
+      onClick={() => handleClick()}
+      disabled={gameStatus == "completed"}
+    >
       <ButtonTypography state={state} sx={{ fontWeight: "bold" }}>
         {text}
       </ButtonTypography>
