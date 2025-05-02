@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { styled } from "@mui/material";
 
 import Box from "@mui/material/Box";
@@ -21,6 +21,7 @@ const AppContainer = styled(Container)({
   display: "flex",
   flexDirection: "column",
   justifyContent: "center",
+  outline: "none",
 });
 
 const CenteredBox = styled(Box)({
@@ -38,8 +39,6 @@ const Content = styled(Box)({
 
 /* APP TODO: 
 
-keyboard should not be interactable during answer check animation (or when game is complete)
-need to keep track of used characters in keyboard section 
 read app configuration file for settings (like MAX_GUESSES, etc.)
 allow entering key instead of only clicking
 add animations?
@@ -61,6 +60,23 @@ function GameApp() {
   const [guess, setGuess] = useState<string>("");
   const answer = getAnswer();
 
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (gameState.status != "ongoing") return;
+    if (event.repeat) return;
+    if (event.key == "Backspace") {
+      deleteChar();
+    } else if (event.key == "Enter") {
+      submitGuess();
+    } else if (/^[a-zA-Z]$/.test(event.key)) {
+      updateGuess(event.key.toUpperCase());
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [guess]); // guess is required dependency to allow the component to rerender and update state
+
   useEffect(() => {
     console.log(`answer => ${answer}`);
   }, []);
@@ -68,6 +84,7 @@ function GameApp() {
   useEffect(() => {
     if (gameState.status == "completed") {
       console.log("winner");
+      // render some modal to display winner msg + guess attempts
     }
 
     if (
@@ -75,11 +92,11 @@ function GameApp() {
       gameState.guesses.length == MAX_GUESSES
     ) {
       console.log("game over");
+      // render some modal to display loser msg + answer?
     }
   }, [gameState]);
 
   const submitGuess = () => {
-    console.log(guess);
     if (guess.length != GUESS_LENGTH) {
       addAlert({ type: "error", message: "Word is too short." });
       return;
@@ -90,6 +107,9 @@ function GameApp() {
       return;
     }
 
+    // do i need to also set gameState status to "completed" when all guesses are used up?
+    // not sure if i do that here or in a useeffect call
+
     // ASSUME BELOW THAT GUESS IS A VALID GUESS
 
     let updatedGameState: GameState = {
@@ -97,10 +117,9 @@ function GameApp() {
       guesses: [...gameState.guesses, guess],
     };
 
-    // reset current guess
+    // reset guess if it was a valid guess
     setGuess("");
 
-    // winner
     if (guess.toUpperCase() === answer.toUpperCase()) {
       updatedGameState = {
         ...updatedGameState,
@@ -108,22 +127,10 @@ function GameApp() {
       };
     }
 
-    // should only call set fn once so have to modify gamestate before this
+    // should only call setGameState fn once so we have to modify gamestate before this
     setGameState(updatedGameState);
     localStorage.setItem(GAME_STATE_KEY, JSON.stringify(updatedGameState));
-
-    // update the display
   };
-
-  // const updateAllGuesses = (gameState: GameState, guess: string) => {
-  //   let updatedGameState = {
-  //     ...gameState,
-  //     guesses: [...gameState.guesses, guess],
-  //   };
-  //   // setGuesses(updatedGuesses);
-  //   setGameState(updatedGameState);
-  //   localStorage.setItem(GAME_STATE_KEY, JSON.stringify(updatedGameState));
-  // };
 
   const updateGuess = (char: string) => {
     setGuess((guess) => {

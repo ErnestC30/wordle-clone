@@ -31,7 +31,6 @@ const AlertProvider = ({ children }: { children: React.ReactNode }) => {
   const clearAlerts = () => setAlerts([]);
 
   const addAlert = (alert: Omit<Alert, "id">) => {
-    console.log("add alert");
     const id = uuidv4();
     setAlerts((prev) => [{ ...alert, id: id }, ...prev]);
   };
