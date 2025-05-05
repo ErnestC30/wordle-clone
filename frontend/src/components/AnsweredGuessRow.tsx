@@ -1,5 +1,6 @@
-import { styled } from "@mui/material";
+import { memo } from "react";
 
+import { styled } from "@mui/material";
 import Box from "@mui/material/Box";
 
 import { CharState } from "./GuessCharacter";
@@ -51,7 +52,7 @@ function getStateOfGuessRowCharacters(guess: string, answer: string): RowState {
   return rowState;
 }
 
-const AnsweredGuessRow: React.FC<AnsweredGuessRowProps> = ({
+const AnsweredGuessRowComponent: React.FC<AnsweredGuessRowProps> = ({
   answer,
   guess,
 }) => {
@@ -62,6 +63,7 @@ const AnsweredGuessRow: React.FC<AnsweredGuessRowProps> = ({
       {rowState.map((guessCharacter, idx) => (
         <GuessCharacter
           key={idx}
+          order={idx}
           char={guessCharacter.char}
           state={guessCharacter.state}
         />
@@ -69,5 +71,8 @@ const AnsweredGuessRow: React.FC<AnsweredGuessRowProps> = ({
     </GuessRowBox>
   );
 };
+
+// memoized to prevent rerendering of the row when guesses are updated
+const AnsweredGuessRow = memo(AnsweredGuessRowComponent);
 
 export default AnsweredGuessRow;

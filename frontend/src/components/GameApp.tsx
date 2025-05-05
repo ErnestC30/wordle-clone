@@ -41,17 +41,15 @@ const Content = styled(Box)({
 
 /* APP TODO: 
 
-keyboard should not be interactable during answer check animation (or when game is complete)
-  - add a "validating" state?
 read app configuration file for settings (like MAX_GUESSES, etc.)
-winner/loser display component
-add animations?
+add delay before showing win/lose modal 
+  - while guessing, should display the modal only after the last guess made (set timeout to acc for delay?)
+  - on page refresh then it should display automatically
+  - we do this by using two different useeffects? (one with gamestate dependency, one without) with diff delays
 
 */
 
 function GameApp() {
-  // should store all guess attempts (as a list of strings?)
-  // store in local storage so that they can be restored / kept on page refresh
   const GAME_STATE_KEY = "gameState";
   const MAX_GUESSES = 6;
   const GUESS_LENGTH = 5;
@@ -66,9 +64,9 @@ function GameApp() {
   const [showLoseModal, setShowLoseModal] = useState(false);
   const answer = getAnswer();
 
-  useEffect(() => {
-    console.log(`answer => ${answer}`);
-  }, []);
+  // useEffect(() => {
+  //   console.log(`answer => ${answer}`);
+  // }, []);
 
   useEffect(() => {
     if (gameState.status == "completed") {
@@ -90,7 +88,6 @@ function GameApp() {
       addAlert({ type: "error", message: "Word not in list." });
       return;
     }
-    // not sure if i do that here or in a useeffect call
 
     // ASSUME BELOW THAT GUESS IS A VALID GUESS
 
