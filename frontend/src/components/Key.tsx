@@ -58,7 +58,7 @@ const Key: React.FC<KeyProps> = ({
     <KeyButton
       state={state}
       onClick={() => handleClick()}
-      disabled={gameStatus == "completed"}
+      disabled={gameStatus != "ongoing"}
     >
       <ButtonTypography state={state} sx={{ fontWeight: "bold" }}>
         {text}

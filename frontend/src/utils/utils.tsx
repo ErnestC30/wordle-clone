@@ -1,6 +1,6 @@
 import wordlist from "../assets/wordlist.json";
 
-type GameStateStatus = "ongoing" | "completed";
+type GameStateStatus = "ongoing" | "completed" | "lost";
 
 interface GameState {
   guesses: string[];

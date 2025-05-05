@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { styled } from "@mui/material";
 
 import Box from "@mui/material/Box";
@@ -8,6 +8,8 @@ import { GameState } from "../utils/utils";
 import { useAlert } from "../contexts/AlertContext";
 import GameBoard from "./GameBoard";
 import Keyboard from "./Keyboard";
+import WinModal from "./WinModal";
+import LoseModal from "./LoseModal";
 
 import {
   checkPuzzleReset,
@@ -39,8 +41,10 @@ const Content = styled(Box)({
 
 /* APP TODO: 
 
+keyboard should not be interactable during answer check animation (or when game is complete)
+  - add a "validating" state?
 read app configuration file for settings (like MAX_GUESSES, etc.)
-allow entering key instead of only clicking
+winner/loser display component
 add animations?
 
 */
@@ -58,24 +62,9 @@ function GameApp() {
   const { addAlert } = useAlert();
   const [gameState, setGameState] = useState<GameState>(initialGameState);
   const [guess, setGuess] = useState<string>("");
+  const [showWinModal, setShowWinModal] = useState(false);
+  const [showLoseModal, setShowLoseModal] = useState(false);
   const answer = getAnswer();
-
-  const handleKeyDown = (event: KeyboardEvent) => {
-    if (gameState.status != "ongoing") return;
-    if (event.repeat) return;
-    if (event.key == "Backspace") {
-      deleteChar();
-    } else if (event.key == "Enter") {
-      submitGuess();
-    } else if (/^[a-zA-Z]$/.test(event.key)) {
-      updateGuess(event.key.toUpperCase());
-    }
-  };
-
-  useEffect(() => {
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [guess]); // guess is required dependency to allow the component to rerender and update state
 
   useEffect(() => {
     console.log(`answer => ${answer}`);
@@ -83,16 +72,11 @@ function GameApp() {
 
   useEffect(() => {
     if (gameState.status == "completed") {
-      console.log("winner");
-      // render some modal to display winner msg + guess attempts
+      setShowWinModal(true);
     }
 
-    if (
-      gameState.status == "ongoing" &&
-      gameState.guesses.length == MAX_GUESSES
-    ) {
-      console.log("game over");
-      // render some modal to display loser msg + answer?
+    if (gameState.status == "lost") {
+      setShowLoseModal(true);
     }
   }, [gameState]);
 
@@ -106,14 +90,13 @@ function GameApp() {
       addAlert({ type: "error", message: "Word not in list." });
       return;
     }
-
-    // do i need to also set gameState status to "completed" when all guesses are used up?
     // not sure if i do that here or in a useeffect call
 
     // ASSUME BELOW THAT GUESS IS A VALID GUESS
 
     let updatedGameState: GameState = {
       ...gameState,
+      guessCount: gameState.guessCount + 1,
       guesses: [...gameState.guesses, guess],
     };
 
@@ -124,6 +107,14 @@ function GameApp() {
       updatedGameState = {
         ...updatedGameState,
         status: "completed",
+      };
+    } else if (
+      guess.toUpperCase() != answer.toUpperCase() &&
+      gameState.guessCount + 1 == MAX_GUESSES
+    ) {
+      updatedGameState = {
+        ...updatedGameState,
+        status: "lost",
       };
     }
 
@@ -142,6 +133,26 @@ function GameApp() {
   const deleteChar = () => {
     setGuess((guess) => guess.substring(0, guess.length - 1));
   };
+
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (gameState.status != "ongoing") return;
+      if (event.repeat) return;
+      if (event.key == "Backspace") {
+        deleteChar();
+      } else if (event.key == "Enter") {
+        submitGuess();
+      } else if (/^[a-zA-Z]$/.test(event.key)) {
+        updateGuess(event.key.toUpperCase());
+      }
+    },
+    [gameState.status, deleteChar, submitGuess, updateGuess]
+  );
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]); // dependency is required to allow the component to rerender and update state
 
   return (
     <AppContainer>
@@ -164,6 +175,8 @@ function GameApp() {
           />
         </Content>
       </CenteredBox>
+      {showWinModal && <WinModal show guessCount={gameState.guessCount} />}
+      {showLoseModal && <LoseModal show answer={answer} />}
     </AppContainer>
   );
 }
