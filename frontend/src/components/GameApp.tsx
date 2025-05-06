@@ -39,16 +39,6 @@ const Content = styled(Box)({
   justifyContent: "space-evenly",
 });
 
-/* APP TODO: 
-
-read app configuration file for settings (like MAX_GUESSES, etc.)
-add delay before showing win/lose modal 
-  - while guessing, should display the modal only after the last guess made (set timeout to acc for delay?)
-  - on page refresh then it should display automatically
-  - we do this by using two different useeffects? (one with gamestate dependency, one without) with diff delays
-
-*/
-
 function GameApp() {
   const GAME_STATE_KEY = "gameState";
   const MAX_GUESSES = 6;
@@ -68,9 +58,22 @@ function GameApp() {
     if (gameState.status == "completed") {
       setShowWinModal(true);
     }
-
     if (gameState.status == "lost") {
       setShowLoseModal(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (gameState.status == "completed") {
+      setTimeout(() => {
+        setShowWinModal(true);
+      }, 2000);
+    }
+
+    if (gameState.status == "lost") {
+      setTimeout(() => {
+        setShowLoseModal(true);
+      }, 2000);
     }
   }, [gameState]);
 
