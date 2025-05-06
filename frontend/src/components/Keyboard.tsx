@@ -25,12 +25,12 @@ interface KeyboardCharStatePriority {
   [state: string]: number;
 }
 
-// state can either be correct , present, absent, unused
-// if char has been in correct spot atleast once, it should be 'correct'
-// if char has been used but has never been in correct spot, it should be 'present'
-// if char does not appear in guess but not in answer, then it should be 'absent'
-// if char does not appear at all in guess, it should be 'unused'
-// RETURN A MAP OF CHAR -> STATE
+/*state can either be correct , present, absent, unused
+ if char has been in correct spot atleast once, it should be 'correct'
+ if char has been used but has never been in correct spot, it should be 'present'
+ if char does not appear in guess but not in answer, then it should be 'absent'
+ if char does not appear at all in guess, it should be 'unused'
+*/
 function getKeyboardCharStates(
   answer: string,
   guesses: string[]
@@ -83,7 +83,7 @@ const Keyboard: React.FC<KeyboardProps> = ({
   const stateMap = getKeyboardCharStates(answer, guesses);
 
   return (
-    <Box>
+    <Box sx={{ width: "100%", maxWidth: "100vw" }}>
       <GameStateStatusContext value={gameStateStatus}>
         <Stack spacing={1}>
           <Stack direction="row" spacing={1} sx={{ justifyContent: "center" }}>

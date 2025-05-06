@@ -30,15 +30,14 @@ const Key: React.FC<KeyProps> = ({
   };
 
   const KeyButton = styled(Button)<{ state: KeyboardCharState }>(
-    ({ state }) => {
-      return {
-        padding: "1rem",
-        minWidth: size == "large" ? "80px" : "24px",
-        maxWidth: "44px",
-        borderRadius: "6px",
-        backgroundColor: stateColorMap[state],
-      };
-    }
+    ({ state }) => ({
+      padding: "clamp(1rem, 2.5vw, 2rem)",
+      width: size === "large" ? "5rem" : "2rem",
+      maxWidth: size === "large" ? "120px" : "40px",
+      minWidth: size === "large" ? "3rem" : "1rem",
+      borderRadius: "6px",
+      backgroundColor: stateColorMap[state],
+    })
   );
 
   const ButtonTypography = styled(Typography)<{ state: KeyboardCharState }>(

@@ -64,10 +64,6 @@ function GameApp() {
   const [showLoseModal, setShowLoseModal] = useState(false);
   const answer = getAnswer();
 
-  // useEffect(() => {
-  //   console.log(`answer => ${answer}`);
-  // }, []);
-
   useEffect(() => {
     if (gameState.status == "completed") {
       setShowWinModal(true);
@@ -88,8 +84,6 @@ function GameApp() {
       addAlert({ type: "error", message: "Word not in list." });
       return;
     }
-
-    // ASSUME BELOW THAT GUESS IS A VALID GUESS
 
     let updatedGameState: GameState = {
       ...gameState,

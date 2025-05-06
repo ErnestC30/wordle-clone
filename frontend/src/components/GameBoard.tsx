@@ -16,7 +16,7 @@ interface GameBoardProps {
 const GameBoardBox = styled(Box)({
   display: "flex",
   flexDirection: "column",
-  gap: "8px",
+  gap: "0.5rem",
 });
 
 const GameBoard: React.FC<GameBoardProps> = ({

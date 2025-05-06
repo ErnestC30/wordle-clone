@@ -19,7 +19,7 @@ type RowState = GuessCharacterState[];
 const GuessRowBox = styled(Box)({
   display: "flex",
   justifyContent: "center",
-  gap: "8px",
+  gap: "0.5rem",
 });
 
 function prepareGuessRow(maxCharacters: number, guess?: string): RowState {
@@ -46,6 +46,7 @@ const GuessRow: React.FC<GuessRowProps> = ({ guess }) => {
       {rowState.map((guessCharacter, idx) => (
         <GuessCharacter
           key={idx}
+          order={idx}
           char={guessCharacter.char}
           state={guessCharacter.state}
         />

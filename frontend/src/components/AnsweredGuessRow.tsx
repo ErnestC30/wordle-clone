@@ -21,7 +21,7 @@ type RowState = GuessCharacterState[];
 const GuessRowBox = styled(Box)({
   display: "flex",
   justifyContent: "center",
-  gap: "8px",
+  gap: "0.5rem",
 });
 
 function getStateOfGuessRowCharacters(guess: string, answer: string): RowState {

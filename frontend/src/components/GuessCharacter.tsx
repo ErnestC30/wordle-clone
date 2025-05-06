@@ -42,10 +42,8 @@ const GuessCharacter: React.FC<GuessCharacterProps> = ({
 
     return {
       boxSizing: "border-box",
-      minWidth: "40px",
-      width: "80px",
-      height: "80px",
-      minHeight: "40px",
+      width: "clamp(4rem, 10vw, 5rem)",
+      height: "clamp(4rem, 10vw, 5rem)",
       display: "grid",
       backgroundColor: "white",
       border: border,
